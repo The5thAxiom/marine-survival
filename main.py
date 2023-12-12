@@ -25,6 +25,7 @@ current_video = cv2.VideoCapture(current_video_path)
 h = int(current_video.get(cv2.CAP_PROP_FRAME_HEIGHT))
 w = int(current_video.get(cv2.CAP_PROP_FRAME_WIDTH))
 current_frame_no: int = 0
+num_frames = int(current_video.get(cv2.CAP_PROP_FRAME_COUNT))
 
 window = tk.Tk()
 # window.geometry(f"{w}x{h}")
@@ -44,38 +45,52 @@ def show_current_frame():
     else:
         print('error hogyi bhaiya')
 
-def manage_buttons():
+def manage_frame_controls():
     global current_frame_no
     global current_video
     global next_button, prev_button
+    global frame_slider
     if current_frame_no == 0:
         prev_button['state'] = "disabled"
     else:
         prev_button['state'] = "active"
-    if current_frame_no == int(current_video.get(cv2.CAP_PROP_FRAME_COUNT)):
+    if current_frame_no == num_frames:
         next_button['state'] = "disabled"
     else:
         next_button['state'] = "active"
 
+    frame_slider.set(current_frame_no)
+
 def increment_frame():
-    global current_frame_no
-    current_frame_no += 1
-    manage_buttons()
-    show_current_frame()
+    global current_frame_no, num_frames
+    if current_frame_no < num_frames:
+        current_frame_no += 1
+        manage_frame_controls()
+        show_current_frame()
 
 def decrement_frame():
     global current_frame_no
-    current_frame_no -= 1
-    manage_buttons()
+    if current_frame_no > 0:
+        current_frame_no -= 1
+        manage_frame_controls()
+        show_current_frame()
+
+def set_frame(event):
+    global current_frame_no
+    global frame_slider
+    current_frame_no = int(frame_slider.get())
+    manage_frame_controls()
     show_current_frame()
 
 next_button = tk.Button(window, text="Next Frame", command=increment_frame)
 prev_button = tk.Button(window, text="Previous Frame", command=decrement_frame)
+frame_slider = tk.Scale(window, from_=0, to=num_frames, orient='horizontal', command=set_frame, length=w/2)
 
-manage_buttons()
+manage_frame_controls()
 show_current_frame()
 
 next_button.pack()
+frame_slider.pack()
 prev_button.pack()
 canvas.pack()
 
