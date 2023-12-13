@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import filedialog as tk_fd
 import cv2
 from PIL import Image, ImageTk
 
@@ -133,6 +134,22 @@ def draw_object_rects():
         current_frame_rectangles.append(rect)
         current_frame_labels.append(rect_label)
 
+def change_file():
+    global current_video_path, current_video, current_frame_no
+    global file_name_sv
+
+    filename = tk_fd.askopenfilename()
+    file_name_sv.set(filename)
+    current_video_path = filename
+    current_video = cv2.VideoCapture(current_video_path)
+    current_frame_no = 0
+    manage_frame_controls()
+    set_current_frame()
+
+file_name_sv = tk.StringVar(value=current_video_path)
+file_name_label = tk.Label(window, textvariable=file_name_sv)
+file_change_button = tk.Button(window, text="Change", command=change_file)
+
 next_button = tk.Button(window, text="Next Frame", command=increment_frame)
 prev_button = tk.Button(window, text="Previous Frame", command=decrement_frame)
 frame_slider = tk.Scale(window, from_=0, to=num_frames, orient='horizontal', command=set_frame_from_slider, length=w/2)
@@ -148,6 +165,8 @@ detect_button = tk.Button(window, text="Detect", command=draw_object_rects)
 
 set_current_frame()
 
+file_name_label.pack()
+file_change_button.pack()
 next_button.pack()
 frame_slider.pack()
 frame_input.pack()

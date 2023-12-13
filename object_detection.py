@@ -12,13 +12,3 @@ def detect(raw_image):
     found, weights = model.detectMultiScale(image,  winStride=(8, 8))
 
     return found, weights
-
-'''
-    objects = detect(current_frame)
-    if len(objects) == 0:
-        return
-    current_frame_rectangles = []
-    for (x, y, h, w) in objects:
-        rect = canvas.create_rectangle(x, y, h, w)
-        current_frame_rectangles.append(rect)
-'''
