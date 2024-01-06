@@ -20,8 +20,7 @@ def get_frame(video: cv2.VideoCapture, frame_no: int):
     video.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
     return video.read()
 
-# current_video_path = '../datasets/video_split_fullhd/DJI_0915_0031_20m.mp4'
-current_video_path = 'c:/Users/samri/Downloads/video1_fast_MP4.mp4'
+current_video_path = '../datasets/video_split_fullhd/DJI_0915_0031_20m.mp4'
 current_video = cv2.VideoCapture(current_video_path)
 h = int(current_video.get(cv2.CAP_PROP_FRAME_HEIGHT))
 w = int(current_video.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -130,7 +129,7 @@ def draw_object_rects():
     current_frame_labels = []
     for (x, y, w, h), weight in zip(objects, weights):
         rect = canvas.create_rectangle((x, y), (x + w, y + h), outline="red")
-        rect_label = canvas.create_text(x, y, text=f"{weight * 100}% confident")
+        rect_label = canvas.create_text(x, y, text=f"{weight * 100}% confident", fill="red")
         current_frame_rectangles.append(rect)
         current_frame_labels.append(rect_label)
 
