@@ -41,7 +41,7 @@ video_file_picker.button.pack()
 
 annotation_file_picker.label.pack()
 annotation_file_picker.button.pack()
-annotator.button.pack()
+annotator.toggle.pack()
 annotator.label.pack()
 
 video_controls.next_button.pack()
