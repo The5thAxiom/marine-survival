@@ -1,13 +1,15 @@
 import tkinter as tk
+from tkinter import colorchooser
 import json
 
 from video_player import Video
 
 class Annotator:
-    def __init__(self, video: Video, format: str='custom', default_file_path: str=None):
+    def __init__(self, video: Video, color:str='red', format: str='custom', default_file_path: str=None):
         self.video = video
         self.window = self.video.window
         self.canvas = self.video.canvas
+        self.color = color
         self.format = format
         if default_file_path is not None:
             self.set_file_path(default_file_path)
@@ -15,10 +17,20 @@ class Annotator:
         self.toggle = tk.Checkbutton(self.window, text="Show Annotations", variable=self.show_annotations_bv, onvalue=True, offvalue=False, command=self.toggle_handler)
         self.annotation_text_sv = tk.StringVar(self.window)
         self.label = tk.Label(self.window, textvariable=self.annotation_text_sv, anchor='w')
+        self.color_label = tk.Label(self.window, text=f'color: ■ {self.color}', fg=self.color)
+        self.color_picker_button = tk.Button(self.window, text='■ Change Color', command=self._ask_user_for_color)
         self.video.add_frame_change_handler(self.redraw_annotations)
         self.current_rects = []
         self.current_labels = []
-    
+
+    def _ask_user_for_color(self):
+        self.set_color(colorchooser.askcolor()[1])
+        self.redraw_annotations()
+
+    def set_color(self, color: str):
+        self.color = color
+        self.color_label.config(text=f'color: ■ {self.color}', fg=self.color)
+
     def set_file_path(self, file_path: str):
         self.file_path = file_path
         
@@ -47,8 +59,8 @@ class Annotator:
         annotation_text = f'{len(annotations)} objects:'
         for i, an in enumerate(annotations):
             x, y, w, h = an['bbox']
-            self.current_rects.append(self.video.canvas.create_rectangle(x, y, x + w, y + h, outline="red", tags=['box']))
-            self.current_labels.append(self.video.canvas.create_text(x, y, text=f"{i}. {an['label']}", fill='red', tags=['label']))
+            self.current_rects.append(self.video.canvas.create_rectangle(x, y, x + w, y + h, outline=self.color, tags=['box']))
+            self.current_labels.append(self.video.canvas.create_text(x, y, text=f"{i}. {an['label']}", fill=self.color, tags=['label']))
             annotation_text += f"\n{i}. {an['label']}"
         self.annotation_text_sv.set(annotation_text)
 
