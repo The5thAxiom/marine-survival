@@ -85,8 +85,8 @@ class VideoControls:
 
         # setting up the ui
         self.ui = tk.Frame(self.window)
-        self.next_button = tk.Button(self.ui, text="Next Frame", command=video.increment_frame)
-        self.prev_button = tk.Button(self.ui, text="Previous Frame", command=video.decrement_frame)
+        self.next_button = tk.Button(self.ui, text="Next Frame", command=self.next_frame)
+        self.prev_button = tk.Button(self.ui, text="Previous Frame", command=self.prev_frame)
         self.frame_slider = tk.Scale(self.ui, from_=0, to=video.num_frames, orient='horizontal', command=self.set_frame_from_slider, length=video.video_width/2)
         self.frame_input_value = tk.StringVar()
         self.frame_input_value.trace("w", self.manage_frame_input_confirm)
@@ -129,3 +129,11 @@ class VideoControls:
             self.frame_input_confirm['state'] = 'active'
         else:
             self.frame_input_confirm['state'] = 'disabled'
+
+    def next_frame(self):
+        self.video.increment_frame()
+        self.update_frame_controls()
+
+    def prev_frame(self):
+        self.video.decrement_frame_frame()
+        self.update_frame_controls()
