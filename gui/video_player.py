@@ -26,16 +26,23 @@ class Video:
 
         # setting up the ui
         self.ui = tk.Frame(self.window)
-        self.canvas = tk.Canvas(self.ui)
+        self.h_scrollbar = tk.Scrollbar(self.ui, orient='horizontal')
+        self.v_scrollbar = tk.Scrollbar(self.ui, orient='vertical')
+        self.canvas = tk.Canvas(self.ui, xscrollcommand=self.h_scrollbar.set, yscrollcommand=self.v_scrollbar.set)
 
+        self.v_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.h_scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
         self.canvas.pack()
+
+        self.h_scrollbar.config(command=self.canvas.xview)
+        self.v_scrollbar.config(command=self.canvas.yview)
 
         if default_video_path is not None:
             self.set_video(default_video_path)
 
 
     def _set_canvas(self):
-        self.canvas.config(width=self.video_width, height=self.video_height)
+        self.canvas.configure(height=600, width= 1000, scrollregion = (0, 0, self.video_width, self.video_height))
         self.canvas_image = self.canvas.create_image(0, 0, anchor='nw')
 
     def set_video(self, video_path: str, fps: int=30):
@@ -50,6 +57,8 @@ class Video:
         self._set_frame()
 
     def _set_frame(self):
+        if self.current_frame_no < 0 or self.current_frame_no >= self.num_frames:
+            return
         self.video.set(cv2.CAP_PROP_POS_FRAMES, self.current_frame_no)
         self.current_frame = self.video.read()[1]
         self._redraw_canvas()
