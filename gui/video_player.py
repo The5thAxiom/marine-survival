@@ -14,7 +14,7 @@ def ocv2_image_to_tk(image):
     return tk_image
 
 class Video:
-    def __init__(self, window: tk.Tk, canvas: tk.Canvas, default_video_path: str=None):
+    def __init__(self, window: tk.Tk, default_video_path: str=None):
         # set video details
         self.window = window
         self.video_path = None
@@ -22,12 +22,17 @@ class Video:
         self.current_frame_no = 0
         self.current_frame = None
         self.current_frame = None
-        self.canvas = canvas
-
         self.frame_change_handlers = []
+
+        # setting up the ui
+        self.ui = tk.Frame(self.window)
+        self.canvas = tk.Canvas(self.ui)
+
+        self.canvas.pack()
 
         if default_video_path is not None:
             self.set_video(default_video_path)
+
 
     def _set_canvas(self):
         self.canvas.config(width=self.video_width, height=self.video_height)
@@ -78,14 +83,23 @@ class VideoControls:
         self.window = window
         self.video = video
 
-        self.next_button = tk.Button(window, text="Next Frame", command=video.increment_frame)
-        self.prev_button = tk.Button(window, text="Previous Frame", command=video.decrement_frame)
-        self.frame_slider = tk.Scale(window, from_=0, to=video.num_frames, orient='horizontal', command=self.set_frame_from_slider, length=video.video_width/2)
+        # setting up the ui
+        self.ui = tk.Frame(self.window)
+        self.next_button = tk.Button(self.ui, text="Next Frame", command=video.increment_frame)
+        self.prev_button = tk.Button(self.ui, text="Previous Frame", command=video.decrement_frame)
+        self.frame_slider = tk.Scale(self.ui, from_=0, to=video.num_frames, orient='horizontal', command=self.set_frame_from_slider, length=video.video_width/2)
         self.frame_input_value = tk.StringVar()
         self.frame_input_value.trace("w", self.manage_frame_input_confirm)
-        self.frame_input = tk.Entry(window, textvariable=self.frame_input_value)
+        self.frame_input = tk.Entry(self.ui, textvariable=self.frame_input_value)
         self.frame_input.bind('<Return>', self.set_frame_from_entry)
-        self.frame_input_confirm = tk.Button(window, text="Set Frame", command=self.set_frame_from_entry)
+        self.frame_input_confirm = tk.Button(self.ui, text="Set Frame", command=self.set_frame_from_entry)
+        
+        self.prev_button.pack(side=tk.LEFT)
+        self.next_button.pack(side=tk.RIGHT)
+        self.frame_slider.pack()
+        self.frame_input.pack()
+        self.frame_input_confirm.pack()
+
         self.update_frame_controls()
 
     def update_frame_controls(self):

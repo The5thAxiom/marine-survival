@@ -5,23 +5,32 @@ import json
 from video_player import Video
 
 class Annotator:
-    def __init__(self, video: Video, color:str='red', format: str='custom', default_file_path: str=None):
+    def __init__(self, window: tk.Tk,  video: Video, color:str='red', format: str='custom', default_file_path: str=None):
         self.video = video
-        self.window = self.video.window
+        self.window = window
         self.canvas = self.video.canvas
         self.color = color
         self.format = format
         if default_file_path is not None:
             self.set_file_path(default_file_path)
-        self.show_annotations_bv = tk.BooleanVar(value=False)
-        self.toggle = tk.Checkbutton(self.window, text="Show Annotations", variable=self.show_annotations_bv, onvalue=True, offvalue=False, command=self.toggle_handler)
-        self.annotation_text_sv = tk.StringVar(self.window)
-        self.label = tk.Label(self.window, textvariable=self.annotation_text_sv, anchor='w')
-        self.color_label = tk.Label(self.window, text=f'color: ■ {self.color}', fg=self.color)
-        self.color_picker_button = tk.Button(self.window, text='■ Change Color', command=self._ask_user_for_color)
         self.video.add_frame_change_handler(self.redraw_annotations)
         self.current_rects = []
         self.current_labels = []
+        
+        # setting up the UI
+        self.ui = tk.Frame(self.window)
+        self.show_annotations_bv = tk.BooleanVar(self.ui, value=False)
+        self.annotation_text_sv = tk.StringVar(self.ui)
+        self.toggle = tk.Checkbutton(self.ui, text="Show Annotations", variable=self.show_annotations_bv, onvalue=True, offvalue=False, command=self.toggle_handler)
+        self.label = tk.Label(self.ui, textvariable=self.annotation_text_sv, anchor='w')
+        self.color_label = tk.Label(self.ui, text=f'color: ■ {self.color}', fg=self.color)
+        self.color_picker_button = tk.Button(self.ui, text='■ Change Color', command=self._ask_user_for_color)
+        
+        self.toggle.pack()
+        self.color_label.pack()
+        self.color_picker_button.pack()
+        self.label.pack()
+
 
     def _ask_user_for_color(self):
         self.set_color(colorchooser.askcolor()[1])
