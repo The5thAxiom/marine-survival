@@ -23,23 +23,30 @@ class Video:
         self.current_frame = None
         self.current_frame = None
         self.frame_change_handlers = []
+        self.video_change_handlers = []
 
         # setting up the ui
         self.ui = tk.Frame(self.window)
+        self.canvas = tk.Canvas(self.ui)
         self.h_scrollbar = tk.Scrollbar(self.ui, orient='horizontal')
         self.v_scrollbar = tk.Scrollbar(self.ui, orient='vertical')
-        self.canvas = tk.Canvas(self.ui, xscrollcommand=self.h_scrollbar.set, yscrollcommand=self.v_scrollbar.set)
 
-        self.v_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        self.h_scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
-        self.canvas.pack()
-
+        self.canvas.config(xscrollcommand=self.h_scrollbar.set, yscrollcommand=self.v_scrollbar.set)
         self.h_scrollbar.config(command=self.canvas.xview)
         self.v_scrollbar.config(command=self.canvas.yview)
 
         if default_video_path is not None:
             self.set_video(default_video_path)
 
+    def _set_ui(self):
+        if self.video is not None:
+            self.v_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            self.h_scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
+            self.canvas.pack()
+        else:
+            self.v_scrollbar.pack_forget()
+            self.h_scrollbar.pack_forget()
+            self.canvas.pack_forget()
 
     def _set_canvas(self):
         self.canvas.configure(height=600, width= 1000, scrollregion = (0, 0, self.video_width, self.video_height))
@@ -54,24 +61,30 @@ class Video:
         self.video_height = int(self.video.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.video_width = int(self.video.get(cv2.CAP_PROP_FRAME_WIDTH))
         self._set_canvas()
+
+        for handler in self.video_change_handlers:
+            handler()
+
         self._set_frame()
+        self._set_ui()
 
     def _set_frame(self):
         if self.current_frame_no < 0 or self.current_frame_no >= self.num_frames:
             return
         self.video.set(cv2.CAP_PROP_POS_FRAMES, self.current_frame_no)
         self.current_frame = self.video.read()[1]
-        self._redraw_canvas()
-    
-    def _redraw_canvas(self):
-        for handler in self.frame_change_handlers:
-            handler()
         frame = ocv2_image_to_tk(self.current_frame)
         self.canvas.image = frame
         self.canvas.itemconfig(self.canvas_image, image=frame)
+
+        for handler in self.frame_change_handlers:
+            handler()
     
     def add_frame_change_handler(self, callback):
         self.frame_change_handlers.append(callback)
+    
+    def add_video_change_handler(self, callback):
+        self.video_change_handlers.append(callback)
     
     def set_current_frame(self, frame_no: int):
         self.current_frame_no = frame_no
@@ -96,20 +109,33 @@ class VideoControls:
         self.ui = tk.Frame(self.window)
         self.next_button = tk.Button(self.ui, text="Next Frame", command=self.next_frame)
         self.prev_button = tk.Button(self.ui, text="Previous Frame", command=self.prev_frame)
-        self.frame_slider = tk.Scale(self.ui, from_=0, to=video.num_frames, orient='horizontal', command=self.set_frame_from_slider, length=video.video_width/2)
+        self.frame_slider = tk.Scale(self.ui, from_=0, orient='horizontal', command=self.set_frame_from_slider)
         self.frame_input_value = tk.StringVar()
         self.frame_input_value.trace("w", self.manage_frame_input_confirm)
         self.frame_input = tk.Entry(self.ui, textvariable=self.frame_input_value)
         self.frame_input.bind('<Return>', self.set_frame_from_entry)
         self.frame_input_confirm = tk.Button(self.ui, text="Set Frame", command=self.set_frame_from_entry)
-        
-        self.prev_button.pack(side=tk.LEFT)
-        self.next_button.pack(side=tk.RIGHT)
-        self.frame_slider.pack()
-        self.frame_input.pack()
-        self.frame_input_confirm.pack()
 
-        self.update_frame_controls()
+        self.video.add_video_change_handler(self.update_slider_for_video)
+        self.video.add_video_change_handler(self._set_ui)
+
+    def _set_ui(self):
+        if self.video.video is not None:
+            self.prev_button.pack(side=tk.LEFT)
+            self.next_button.pack(side=tk.RIGHT)
+            self.frame_slider.pack()
+            self.frame_input.pack()
+            self.frame_input_confirm.pack()
+            self.update_frame_controls()
+        else:
+            self.prev_button.pack_forget()
+            self.next_button.pack_forget()
+            self.frame_slider.pack_forget()
+            self.frame_input.pack_forget()
+            self.frame_input_confirm.pack_forget()
+
+    def update_slider_for_video(self):
+        self.frame_slider.config(to=self.video.num_frames, length=self.video.video_width/2)
 
     def update_frame_controls(self):
         if self.video.current_frame_no == 0:

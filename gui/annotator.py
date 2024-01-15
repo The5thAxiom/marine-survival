@@ -25,12 +25,18 @@ class Annotator:
         self.label = tk.Label(self.ui, textvariable=self.annotation_text_sv, anchor='w')
         self.color_label = tk.Label(self.ui, text=f'color: ■ {self.color}', fg=self.color)
         self.color_picker_button = tk.Button(self.ui, text='■ Change Color', command=self._ask_user_for_color)
-        
-        self.toggle.pack()
-        self.color_label.pack()
-        self.color_picker_button.pack()
-        self.label.pack()
 
+    def _set_ui(self):
+        if self.file_path is not None:
+            self.toggle.pack()
+            self.color_label.pack()
+            self.color_picker_button.pack()
+            self.label.pack()
+        else:
+            self.toggle.pack_forget()
+            self.color_label.pack_forget()
+            self.color_picker_button.pack_forget()
+            self.label.pack_forget()
 
     def _ask_user_for_color(self):
         self.set_color(colorchooser.askcolor()[1])
@@ -45,6 +51,8 @@ class Annotator:
         
         if self.format == 'custom':
             self.load_custom_json()
+        
+        self._set_ui()
 
     def load_custom_json(self):
         with open(self.file_path, 'r') as json_file:
