@@ -64,6 +64,8 @@ class Annotator:
     
     def draw_frame_annotations(self):
         self.clear_annotations()
+        if self.video.current_frame_no > self.vidoe.num_frames:
+            return
         annotations = self.get_frame_annotations(self.video.current_frame_no)
         annotation_text = f'{len(annotations)} objects:'
         for i, an in enumerate(annotations):

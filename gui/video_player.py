@@ -135,5 +135,5 @@ class VideoControls:
         self.update_frame_controls()
 
     def prev_frame(self):
-        self.video.decrement_frame_frame()
+        self.video.decrement_frame()
         self.update_frame_controls()
