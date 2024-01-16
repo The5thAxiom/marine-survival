@@ -1,6 +1,10 @@
 import tkinter as tk
 from tkinter import filedialog as tk_fd
 
+def get_file_name_from_path(path: str):
+    split_char = '/'
+    return path.split(split_char)[-1]
+
 '''
 `FilePicker.label: tk.Label` => displays the 'name' and the name of the selected file
 '''
@@ -29,7 +33,7 @@ class FilePicker:
             self.remove_button.pack_forget()
             self.button.config(text='Add')
         else:
-            self.label.config(text=f'{self.name}: {self.file_path}')
+            self.label.config(text=f'{self.name}: {get_file_name_from_path(self.file_path)}')
             self.remove_button.pack(side=tk.RIGHT)
             self.button.config(text='Change')
 

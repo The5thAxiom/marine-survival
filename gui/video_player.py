@@ -49,7 +49,7 @@ class Video:
             self.canvas.pack_forget()
 
     def _set_canvas(self):
-        self.canvas.configure(height=600, width= 1000, scrollregion = (0, 0, self.video_width, self.video_height))
+        self.canvas.configure(height=600, width=1000, scrollregion = (0, 0, self.video_width, self.video_height))
         self.canvas_image = self.canvas.create_image(0, 0, anchor='nw')
 
     def set_video(self, video_path: str, fps: int=30):
