@@ -54,13 +54,16 @@ class Video:
 
     def set_video(self, video_path: str, fps: int=30):
         self.video_path = video_path
-        self.video = cv2.VideoCapture(self.video_path)
-        self.video.set(cv2.CAP_PROP_FPS, fps)
-        self.current_frame_no = 0
-        self.num_frames = int(self.video.get(cv2.CAP_PROP_FRAME_COUNT))
-        self.video_height = int(self.video.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        self.video_width = int(self.video.get(cv2.CAP_PROP_FRAME_WIDTH))
-        self._set_canvas()
+        if video_path is None or video_path == '':
+            self.video = None
+        else:
+            self.video = cv2.VideoCapture(self.video_path)
+            self.video.set(cv2.CAP_PROP_FPS, fps)
+            self.current_frame_no = 0
+            self.num_frames = int(self.video.get(cv2.CAP_PROP_FRAME_COUNT))
+            self.video_height = int(self.video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            self.video_width = int(self.video.get(cv2.CAP_PROP_FRAME_WIDTH))
+            self._set_canvas()
 
         for handler in self.video_change_handlers:
             handler()
@@ -69,6 +72,8 @@ class Video:
         self._set_ui()
 
     def _set_frame(self):
+        if self.video is None:
+            return
         if self.current_frame_no < 0 or self.current_frame_no >= self.num_frames:
             return
         self.video.set(cv2.CAP_PROP_POS_FRAMES, self.current_frame_no)

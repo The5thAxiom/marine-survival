@@ -13,23 +13,34 @@ class FilePicker:
 
         # setting up the ui
         self.ui = tk.Frame(self.window)
-        self.file_path_sv = tk.StringVar(self.ui, value=default_file_path)
-        self.label_text = tk.StringVar(self.ui, value=f'{self.name}: {"No file selected" if default_file_path is None else default_file_path}')
-        self.label = tk.Label(self.ui, textvariable=self.label_text)
-        self.button = tk.Button(self.ui, text="Change", command=self._prompt_user)
+        self.file_path = default_file_path
+        self.label = tk.Label(self.ui)
+        self.button = tk.Button(self.ui, command=self._prompt_user)
+        self.remove_button = tk.Button(self.ui, text='Remove', command=self.remove_file)
 
         self.label.pack(side=tk.LEFT)
-        self.button.pack(side=tk.RIGHT)
+        self.button.pack(side=tk.LEFT)
+
+        self._set_ui()
+
+    def _set_ui(self):
+        if self.file_path in [None, '']:
+            self.label.config(text=f'{self.name}: No file selected')
+            self.remove_button.pack_forget()
+            self.button.config(text='Add')
+        else:
+            self.label.config(text=f'{self.name}: {self.file_path}')
+            self.remove_button.pack(side=tk.RIGHT)
+            self.button.config(text='Change')
 
     def _prompt_user(self):
-        new_file_path = tk_fd.askopenfilename(initialdir=self.opening_directory)
-        if new_file_path is None or new_file_path == '':
-            self.label_text.set(f'{self.name}: No file selected')
-        else:
-            self.file_path_sv.set(new_file_path)
-            self.label_text.set(f'{self.name}: {self.file_path_sv.get()}')
-            if self.on_file_change is not None:
-                self.on_file_change(self)
+        self.file_path = tk_fd.askopenfilename(initialdir=self.opening_directory)
+        self._set_ui()
+        if self.on_file_change is not None:
+            self.on_file_change(self)
 
-    def get_file_path(self):
-        return self.file_path_sv.get()
+    def remove_file(self):
+        self.file_path = None
+        self._set_ui()
+        if self.on_file_change is not None:
+            self.on_file_change(self)

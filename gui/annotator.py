@@ -49,8 +49,9 @@ class Annotator:
     def set_file_path(self, file_path: str):
         self.file_path = file_path
         
-        if self.format == 'custom':
-            self.load_custom_json()
+        if file_path is not None:
+            if self.format == 'custom':
+                self.load_custom_json()
         
         self._set_ui()
 
