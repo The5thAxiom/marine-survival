@@ -9,18 +9,16 @@ window = tk.Tk()
 window.state('zoomed')
 window.title('Marine Survival Object Detection')
 
-container = tk.PanedWindow(window, orient=tk.VERTICAL)
+# the header
+header = tk.Frame(window)
+heading=tk.Label(header, text='Marine Survival Object Detection', font=('Arial', 25))
+heading.pack()
 
-# the header pane
-header_pane = tk.PanedWindow(container, orient=tk.VERTICAL)
-heading=tk.Label(header_pane, text='Marine Survival Object Detection', font=('Arial', 25))
-header_pane.add(heading)
-
-# the body pane (lol)
-body_pane = tk.PanedWindow(container, orient=tk.HORIZONTAL)
+# the body
+body = tk.Frame(window)
 
 # the main pane
-main_pane = tk.PanedWindow(body_pane, orient=tk.VERTICAL)
+main_pane = tk.Frame(body)
 
 video = Video(main_pane)
 video_controls = VideoControls(main_pane, video)
@@ -30,12 +28,12 @@ video_file_picker = FilePicker(
     opening_directory='D:/VIT/year4/sem8/Capstone/datasets/MOBDrone/videos/'
 )
 
-main_pane.add(video_file_picker.ui)
-main_pane.add(video_controls.ui)
-main_pane.add(video.ui)
+video_file_picker.ui.pack()
+video_controls.ui.pack()
+video.ui.pack()
 
 # the left pane
-left_pane = tk.PanedWindow(body_pane, orient=tk.VERTICAL)
+left_pane = tk.Frame(body)
 
 annotation_file_picker = FilePicker(
     left_pane, 'Annotation File',
@@ -44,16 +42,14 @@ annotation_file_picker = FilePicker(
 )
 annotator = Annotator(left_pane, video)
 
-left_pane.add(annotation_file_picker.ui)
-left_pane.add(annotator.ui)
+annotation_file_picker.ui.pack()
+annotator.ui.pack()
 
 # layout of panes
-container.pack(fill=tk.BOTH, expand=True)
-container.add(header_pane)
-container.add(body_pane)
-
-body_pane.add(left_pane)
-body_pane.add(main_pane)
+header.pack(fill=tk.X, expand=False)
+body.pack(fill=tk.Y, expand=False)
+left_pane.pack(side=tk.LEFT, fill=tk.X, expand=False)
+main_pane.pack(fill=tk.BOTH, expand=True)
 
 create_menubar(window, {
     'File': [

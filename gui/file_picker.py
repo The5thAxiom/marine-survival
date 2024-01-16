@@ -18,7 +18,7 @@ class FilePicker:
         self.button = tk.Button(self.ui, command=self._prompt_user)
         self.remove_button = tk.Button(self.ui, text='Remove', command=self.remove_file)
 
-        self.label.pack(side=tk.LEFT)
+        self.label.pack(side=tk.TOP)
         self.button.pack(side=tk.LEFT)
 
         self._set_ui()
