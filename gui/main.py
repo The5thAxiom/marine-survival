@@ -7,34 +7,53 @@ from menubar import create_menubar
 
 window = tk.Tk()
 window.state('zoomed')
+window.title('Marine Survival Object Detection')
 
-video = Video(window)
+container = tk.PanedWindow(window, orient=tk.VERTICAL)
 
-def video_file_change_handler(picker: FilePicker):
-    print(f'setting video: {picker.file_path}')
-    video.set_video(picker.file_path, fps=30)
+# the header pane
+header_pane = tk.PanedWindow(container, orient=tk.VERTICAL)
+heading=tk.Label(header_pane, text='Marine Survival Object Detection', font=('Arial', 25))
+header_pane.add(heading)
 
+# the body pane (lol)
+body_pane = tk.PanedWindow(container, orient=tk.HORIZONTAL)
+
+# the main pane
+main_pane = tk.PanedWindow(body_pane, orient=tk.VERTICAL)
+
+video = Video(main_pane)
+video_controls = VideoControls(main_pane, video)
 video_file_picker = FilePicker(
-    window, 'Video File',
-    on_file_change=video_file_change_handler,
+    main_pane, 'Video File',
+    on_file_change=lambda picker: video.set_video(picker.file_path, fps=30),
     opening_directory='D:/VIT/year4/sem8/Capstone/datasets/MOBDrone/videos/'
 )
 
-def annotation_file_change_handler(picker: FilePicker):
-    annotator.set_file_path(picker.file_path)
+main_pane.add(video_file_picker.ui)
+main_pane.add(video_controls.ui)
+main_pane.add(video.ui)
+
+# the left pane
+left_pane = tk.PanedWindow(body_pane, orient=tk.VERTICAL)
 
 annotation_file_picker = FilePicker(
-    window, 'Annotation File',
-    on_file_change=annotation_file_change_handler,
+    left_pane, 'Annotation File',
+    on_file_change=lambda picker: annotator.set_file_path(picker.file_path),
     opening_directory='D:/VIT/year4/sem8/Capstone/datasets/MOBDrone/annotations/custom-format/'
 )
+annotator = Annotator(left_pane, video)
 
-annotator = Annotator(window, video)
+left_pane.add(annotation_file_picker.ui)
+left_pane.add(annotator.ui)
 
-video_controls = VideoControls(window, video)
+# layout of panes
+container.pack(fill=tk.BOTH, expand=True)
+container.add(header_pane)
+container.add(body_pane)
 
-window.title('Marine Survival Object Detection')
-tk.Label(window, text='Marine Survival Object Detection', font=('Arial', 25)).pack()
+body_pane.add(left_pane)
+body_pane.add(main_pane)
 
 create_menubar(window, {
     'File': [
@@ -47,13 +66,5 @@ create_menubar(window, {
         {'type': 'command', 'label': 'Made By Samridh'}
     ]
 })
-
-video_file_picker.ui.pack()
-
-annotation_file_picker.ui.pack()
-annotator.ui.pack()
-
-video_controls.ui.pack()
-video.ui.pack()
 
 window.mainloop()
