@@ -1,17 +1,20 @@
+import webbrowser
+
 import tkinter as tk
 
 from video_player import Video, VideoControls
 from file_picker import FilePicker
 from annotator import Annotator
 from menubar import create_menubar
+from tabs import Tabs
 
 window = tk.Tk()
 window.state('zoomed')
-window.title('Marine Survival Object Detection')
+window.title('Marine Survival Image Processing')
 
 # the header
 header = tk.Frame(window)
-heading=tk.Label(header, text='Marine Survival Object Detection', font=('Arial', 25))
+heading=tk.Label(header, text='Marine Survival Image Processing', font=('Arial', 25))
 heading.pack()
 
 # the body
@@ -35,20 +38,36 @@ video.ui.pack()
 # the left pane
 left_pane = tk.Frame(body)
 
+annotations = tk.Frame(left_pane)
 annotation_file_picker = FilePicker(
-    left_pane, 'Annotation File',
+    annotations, 'Annotation File',
     on_file_change=lambda picker: annotator.set_file_path(picker.file_path),
     opening_directory='D:/VIT/year4/sem8/Capstone/datasets/MOBDrone/annotations/custom-format/'
 )
-annotator = Annotator(left_pane, video)
+annotator = Annotator(annotations, video)
 
+tk.Label(annotations, text='Annotations', font=(0, 18)).pack()
 annotation_file_picker.ui.pack()
 annotator.ui.pack()
 
+object_detectors = tk.Frame(left_pane)
+tk.Label(object_detectors, text='Detectors', font=(0, 18)).pack()
+tk.Label(object_detectors, text='detectors yet to be added').pack()
+
+object_trackers = tk.Frame(left_pane)
+tk.Label(object_trackers, text='Trackers', font=(0, 18)).pack()
+tk.Label(object_trackers, text='trackers yet to be added').pack()
+
+Tabs(left_pane, [
+    {'name': 'Annotations', 'widget': annotations},
+    {'name': 'Detectors', 'widget': object_detectors},
+    {'name': 'Trackers', 'widget': object_trackers},
+])
+
 # layout of panes
 header.pack(fill=tk.X, expand=False)
-body.pack(fill=tk.Y, expand=False)
-left_pane.pack(side=tk.LEFT, fill=tk.X, expand=False)
+body.pack(fill=tk.X, expand=False)
+left_pane.pack(side=tk.LEFT, fill=tk.Y, expand=False)
 main_pane.pack(fill=tk.BOTH, expand=True)
 
 create_menubar(window, {
@@ -59,7 +78,8 @@ create_menubar(window, {
         {'type': 'command', 'label': 'Exit', 'command': window.destroy}
     ],
     'About': [
-        {'type': 'command', 'label': 'Made By Samridh'}
+        {'type': 'command', 'label': 'Made By Samridh'},
+        {'type': 'command', 'label': 'Github', 'command': lambda: webbrowser.open('https://github.com/The5thAxiom/marine-survival')}
     ]
 })
 
