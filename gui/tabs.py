@@ -31,7 +31,7 @@ class Tabs:
         if self.main is not None and self.main.winfo_manager():
             self.main.pack_forget()
         self.main = self.tabs_list[self.active_tab_index]['widget']
-        self.main.pack(side=tk.BOTTOM, expand=True)
+        self.main.pack(side=tk.TOP, expand=True)
     
     def tab_button_handler(self, tab_index=None):
         return lambda: self.set_active_tab(tab_index)

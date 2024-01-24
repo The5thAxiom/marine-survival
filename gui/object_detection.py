@@ -1,14 +1,7 @@
-import cv2
+from ultralytics import YOLO
 
-# model = cv2.CascadeClassifier(cv2.HOGDescriptor_getDefaultPeopleDetector())
+yolov8 = YOLO('yolov8m.pt')
 
-model = cv2.HOGDescriptor()
-model.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
-
-def detect(raw_image):
-    global model
-
-    image = raw_image
-    found, weights = model.detectMultiScale(image,  winStride=(8, 8))
-
-    return found, weights
+def detect(image):
+    res = yolov8(image)
+    return res[0]

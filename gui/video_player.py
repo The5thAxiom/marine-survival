@@ -1,3 +1,5 @@
+from time import time, sleep
+
 import tkinter as tk
 import cv2
 from PIL import Image, ImageTk
@@ -20,7 +22,6 @@ class Video:
         self.video_path = None
         self.video = None
         self.current_frame_no = 0
-        self.current_frame = None
         self.current_frame = None
         self.frame_change_handlers = []
         self.video_change_handlers = []
@@ -109,7 +110,7 @@ class VideoControls:
     def __init__(self, window: tk.Tk, video: Video):
         self.window = window
         self.video = video
-
+        # self.is_playing = False
         # setting up the ui
         self.ui = tk.Frame(self.window)
         self.next_button = tk.Button(self.ui, text="Next Frame", command=self.next_frame)
@@ -120,6 +121,7 @@ class VideoControls:
         self.frame_input = tk.Entry(self.ui, textvariable=self.frame_input_value)
         self.frame_input.bind('<Return>', self.set_frame_from_entry)
         self.frame_input_confirm = tk.Button(self.ui, text="Set Frame", command=self.set_frame_from_entry)
+        # self.play_pause_button = tk.Button(self.ui, text='Play')
 
         self.video.add_video_change_handler(self.update_slider_for_video)
         self.video.add_video_change_handler(self._set_ui)
@@ -131,6 +133,8 @@ class VideoControls:
             self.frame_slider.pack()
             self.frame_input.pack()
             self.frame_input_confirm.pack()
+            # self.play_pause_button.pack()
+            # self.play_pause_button.config(text='Pause' if self.is_playing else 'Play')
             self.update_frame_controls()
         else:
             self.prev_button.pack_forget()
@@ -177,3 +181,17 @@ class VideoControls:
     def prev_frame(self):
         self.video.decrement_frame()
         self.update_frame_controls()
+    
+    # def toggle_play(self):
+    #     self.is_playing = not self.is_playing
+    #     if self.is_playing:
+    #         self.play()
+    
+    # def play(self):
+    #     t = time()
+    #     fps = 30
+    #     frame_time_difference = 1/30
+    #     while self.video.current_frame_no < self.video.num_frames:
+    #         sleep(frame_time_difference - (time() - t))
+    #         t = time()
+    #         self.next_frame()

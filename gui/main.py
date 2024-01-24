@@ -5,6 +5,8 @@ import tkinter as tk
 from video_player import Video, VideoControls
 from file_picker import FilePicker
 from annotator import Annotator
+from detector import YOLODetector
+
 from menubar import create_menubar
 from tabs import Tabs
 
@@ -51,17 +53,24 @@ annotation_file_picker.ui.pack()
 annotator.ui.pack()
 
 object_detectors = tk.Frame(left_pane)
+detector = YOLODetector(object_detectors, video)
+detector_file_picker = FilePicker(
+    object_detectors, 'Detector File',
+    on_file_change=lambda picker: detector.set_model_file(picker.file_path),
+    opening_directory='D:/VIT/year4/sem8/Capstone/cv-models/yolov8'
+)
 tk.Label(object_detectors, text='Detectors', font=(0, 18)).pack()
-tk.Label(object_detectors, text='detectors yet to be added').pack()
+detector_file_picker.ui.pack()
+detector.ui.pack()
 
-object_trackers = tk.Frame(left_pane)
-tk.Label(object_trackers, text='Trackers', font=(0, 18)).pack()
-tk.Label(object_trackers, text='trackers yet to be added').pack()
+# object_trackers = tk.Frame(left_pane)
+# tk.Label(object_trackers, text='Trackers', font=(0, 18)).pack()
+# tk.Label(object_trackers, text='trackers yet to be added').pack()
 
 Tabs(left_pane, [
     {'name': 'Annotations', 'widget': annotations},
     {'name': 'Detectors', 'widget': object_detectors},
-    {'name': 'Trackers', 'widget': object_trackers},
+    # {'name': 'Trackers', 'widget': object_trackers},
 ])
 
 # layout of panes

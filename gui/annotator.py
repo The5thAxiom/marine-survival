@@ -84,7 +84,6 @@ class Annotator:
             annotation_text += f"\n{i}. {an['label']}"
         self.annotation_text_sv.set(annotation_text)
 
-
     def clear_annotations(self):
         self.video.canvas.delete(['box', 'label']) # this alone SHOULD work but wasn't working for some reason
         for rect in self.current_rects:
